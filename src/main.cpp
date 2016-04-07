@@ -17,7 +17,7 @@ GLFWwindow* window;
 using namespace std;
 
 glm::vec3 cameraPos = glm::vec3(4,3,-3);
-glm::vec3 lightPos = glm::vec3(0,0,3);
+glm::vec3 lightPos = glm::vec3(4,3,-3);
 float rotateDeg = 0.0;
 glm::vec3 rotateAxis(0,1,0);
 
@@ -33,8 +33,14 @@ int main( void )
 
 	vector<glm::vec3> vertices;
 	vector<glm::vec3> normals;
-	bool res = loadOBJFile("assets/models/monkey.obj", vertices, normals);
-	cout << "Vertices: " << vertices.size() << endl;
+	bool res = loadOBJFile("assets/models/cube.obj", vertices, normals);
+	cout << vertices.size() << " vertices loaded." << endl;
+	cout << normals.size()  << " normals loaded." << endl << endl;
+	vector<glm::vec3> normalDraw;
+	for (int i=0;i<vertices.size();i++) {
+		normalDraw.push_back(vertices[i]);
+		normalDraw.push_back(vertices[i]+(0.2f*normals[i]));
+	}
 
 	// Initialise GLFW
 	if( !glfwInit() )
@@ -68,22 +74,27 @@ int main( void )
 		return -1;
 	}
 
-	GLuint programID = LoadShaders( "assets/shaders/SimpleVertexShader.vert", "assets/shaders/SimpleFragmentShader.frag" );
+	GLuint programID = LoadShaders( "assets/shaders/DiffuseVertexShader.vert", "assets/shaders/DiffuseFragmentShader.frag" );
 
 	// Dark blue background
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
-	GLuint vertexbuffer;
-	glGenBuffers(1,&vertexbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER,vertexbuffer);
+	GLuint vertexBuffer;
+	glGenBuffers(1,&vertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER,vertexBuffer);
 	glBufferData(GL_ARRAY_BUFFER,vertices.size() * sizeof(glm::vec3),&vertices[0],GL_STATIC_DRAW);
 
-	GLuint normalbuffer;
-	glGenBuffers(1,&normalbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER,normalbuffer);
+	GLuint normalBuffer;
+	glGenBuffers(1,&normalBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER,normalBuffer);
 	glBufferData(GL_ARRAY_BUFFER,normals.size() * sizeof(glm::vec3),&normals[0],GL_STATIC_DRAW);
+
+	GLuint normalDrawBuffer;
+	glGenBuffers(1,&normalDrawBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER,normalDrawBuffer);
+	glBufferData(GL_ARRAY_BUFFER,normalDraw.size() * sizeof(glm::vec3),&normalDraw[0],GL_STATIC_DRAW);
 
 	GLuint vao;
 	glGenVertexArrays(1,&vao);
@@ -98,11 +109,13 @@ int main( void )
 	);
 	glm::mat4 mvp = projection * view;
 
-	GLuint viewID = glGetUniformLocation(programID,"v");
 	GLuint modelID = glGetUniformLocation(programID,"m");
+	GLuint viewID = glGetUniformLocation(programID,"v");
 
-	GLuint lightPosID = glGetUniformLocation(programID,"lightPos_worldspace");
-	glUniformMatrix4fv(lightPosID, 1, GL_FALSE, &lightPos[0]);
+	GLuint lightPosID = glGetUniformLocation(programID,"lightPos");
+	//glUniformMatrix4fv(lightPosID, 1, GL_FALSE, &lightPos[0]);
+	glUniform3f(lightPosID,lightPos.x,lightPos.y,lightPos.z);
+	cout << "lightPos = [" << lightPos.x << ", " << lightPos.y << ", " << lightPos.z << "]" << endl;
 
 	//GLuint programID = LoadShaders( "SimpleVertexShader.vert","SimpleFragmentShader.frag");
 	cout << "test..." << endl;
@@ -120,10 +133,10 @@ int main( void )
 		glm::mat4 mvp = projection * view * model;
 
 		glUniformMatrix4fv(mvpID, 1, GL_FALSE, &mvp[0][0]);
-		glUniformMatrix4fv(viewID, 1, GL_FALSE, &view[0][0]);
 		glUniformMatrix4fv(modelID, 1, GL_FALSE, &model[0][0]);
+		glUniformMatrix4fv(viewID, 1, GL_FALSE, &view[0][0]);
 
-		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(
 			0,
@@ -134,7 +147,7 @@ int main( void )
 			(void*)0
 		);
 
-		glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(
 			1,
@@ -149,6 +162,19 @@ int main( void )
 		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);
 
+		glBindBuffer(GL_ARRAY_BUFFER, normalDrawBuffer);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(
+			0,
+			3,
+			GL_FLOAT,
+			GL_FALSE,
+			0,
+			(void*)0
+		);
+		glDrawArrays(GL_LINES,0,normalDraw.size());
+		glDisableVertexAttribArray(0);
+
 		// Swap buffers
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -156,7 +182,9 @@ int main( void )
 	} // Check if the ESC key was pressed or the window was closed
 	while( running && !glfwWindowShouldClose(window));
 
-	glDeleteBuffers(1,&vertexbuffer);
+	glDeleteBuffers(1,&vertexBuffer);
+	glDeleteBuffers(1,&normalBuffer);
+	glDeleteBuffers(1,&normalDrawBuffer);
 	glDeleteVertexArrays(1,&vao);
 	glDeleteProgram(programID);
 

@@ -31,8 +31,8 @@ bool loadOBJ(istream &stream, vector<glm::vec3> &vertices, vector<glm::vec3> &no
       }
       if (header == "vn"){
         float x,y,z;
-        int tmp = line.find_first_of(" ",headEnd+2);
-        x = stof(line.substr(headEnd+2,tmp));
+        int tmp = line.find_first_of(" ",headEnd+1);
+        x = stof(line.substr(headEnd+1,tmp));
         int tmp2 = line.find_first_of(" ",tmp+1);
         y = stof(line.substr(tmp+1,tmp2));
         tmp = line.find_first_of(" ",tmp2+1);
@@ -74,6 +74,11 @@ bool loadOBJ(istream &stream, vector<glm::vec3> &vertices, vector<glm::vec3> &no
           else {
             normal = stof(sub);
           }
+
+          /*cout << "V" << vertex << ": [" << vertexList[vertex-1][0] << ", " << vertexList[vertex-1][1] << ", " << vertexList[vertex-1][2] << "]" << endl;
+          cout << "N" << normal << ": [" << normalList[normal-1][0] << ", " << normalList[normal-1][1] << ", " << normalList[normal-1][2] << "]" << endl;
+          string input;
+          cin >> input; //*/
 
           vertices.push_back(vertexList[vertex-1]);
           normals.push_back(normalList[normal-1]);
