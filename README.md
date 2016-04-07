@@ -3,22 +3,22 @@ OpenGL Visualization showing how different elements in an environment are effect
 
 # System Requirements:
 
-Hardware:
+Hardware:  
 +Graphics card with OpenGL 3 support.
 
-Software:
-+glm
-+glfw3
-+glew
+Software:  
++glm  
++glfw3  
++glew  
 +up-to-date graphics card drivers.
 
 If any of these are problematic, please let me know. I can look into converting code OGL 2 if needed and I can include dependencies if need be.
 
 # Installation:
 
-Run the following commands:
-1. 'cmake .'
-2. 'make'
+Run the following commands:  
+1. `cmake .`  
+2. `make`
 
 This should generate an executable for your system. However, assets are not packed into this executable, so it will only run while the "assets" folder is in the same folder as the executable.
 
