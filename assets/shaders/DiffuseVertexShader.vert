@@ -16,7 +16,7 @@ void main(){
 
   vec3 vertexPosition_cameraspace = (v * m * vec4(vertexPosition_modelspace,1)).xyz;
 
-	vec3 lightPosition_cameraspace = (v * vec4(lightPos[0],lightPos[1],lightPos[2],1)).xyz;	//Comment this line to fix.
+	vec3 lightPosition_cameraspace = (v * vec4(lightPos.x,lightPos.y,lightPos.z,1)).xyz;	//Comment this line to fix.
 	//vec3 lightPosition_cameraspace = (v * vec4(4,3,-3,1)).xyz;														//Uncomment this line to fix
 
 	lightRay_cameraspace = lightPosition_cameraspace - vertexPosition_cameraspace;

@@ -16,8 +16,8 @@ GLFWwindow* window;
 
 using namespace std;
 
-glm::vec3 cameraPos = glm::vec3(4,3,-3);
-glm::vec3 lightPos = glm::vec3(4,3,-3);
+glm::vec3 cameraPos = glm::vec3(0,1,5);
+glm::vec3 lightPos = glm::vec3(3,4,3);
 float rotateDeg = 0.0;
 glm::vec3 rotateAxis(0,1,0);
 
@@ -33,14 +33,9 @@ int main( void )
 
 	vector<glm::vec3> vertices;
 	vector<glm::vec3> normals;
-	bool res = loadOBJFile("assets/models/cube.obj", vertices, normals);
+	bool res = loadOBJFile("assets/models/monkey.obj", vertices, normals);
 	cout << vertices.size() << " vertices loaded." << endl;
 	cout << normals.size()  << " normals loaded." << endl << endl;
-	vector<glm::vec3> normalDraw;
-	for (int i=0;i<vertices.size();i++) {
-		normalDraw.push_back(vertices[i]);
-		normalDraw.push_back(vertices[i]+(0.2f*normals[i]));
-	}
 
 	// Initialise GLFW
 	if( !glfwInit() )
@@ -91,34 +86,18 @@ int main( void )
 	glBindBuffer(GL_ARRAY_BUFFER,normalBuffer);
 	glBufferData(GL_ARRAY_BUFFER,normals.size() * sizeof(glm::vec3),&normals[0],GL_STATIC_DRAW);
 
-	GLuint normalDrawBuffer;
-	glGenBuffers(1,&normalDrawBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER,normalDrawBuffer);
-	glBufferData(GL_ARRAY_BUFFER,normalDraw.size() * sizeof(glm::vec3),&normalDraw[0],GL_STATIC_DRAW);
-
 	GLuint vao;
 	glGenVertexArrays(1,&vao);
 	glBindVertexArray(vao);
 
 	GLuint mvpID = glGetUniformLocation(programID,"mvp");
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f),(float)640/(float)480,0.1f,100.0f);
-	glm::mat4 view = glm::lookAt(
-		cameraPos,	// Camera location.
-		glm::vec3(0,0,0),	// Looking at origin.
-		glm::vec3(0,1,0)	// Up vector.
-	);
-	glm::mat4 mvp = projection * view;
 
 	GLuint modelID = glGetUniformLocation(programID,"m");
 	GLuint viewID = glGetUniformLocation(programID,"v");
 
 	GLuint lightPosID = glGetUniformLocation(programID,"lightPos");
-	//glUniformMatrix4fv(lightPosID, 1, GL_FALSE, &lightPos[0]);
-	glUniform3f(lightPosID,lightPos.x,lightPos.y,lightPos.z);
-	cout << "lightPos = [" << lightPos.x << ", " << lightPos.y << ", " << lightPos.z << "]" << endl;
 
-	//GLuint programID = LoadShaders( "SimpleVertexShader.vert","SimpleFragmentShader.frag");
-	cout << "test..." << endl;
 	do{
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
@@ -135,6 +114,7 @@ int main( void )
 		glUniformMatrix4fv(mvpID, 1, GL_FALSE, &mvp[0][0]);
 		glUniformMatrix4fv(modelID, 1, GL_FALSE, &model[0][0]);
 		glUniformMatrix4fv(viewID, 1, GL_FALSE, &view[0][0]);
+		glUniform3f(lightPosID,lightPos[0],lightPos[1],lightPos[2]);
 
 		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 		glEnableVertexAttribArray(0);
@@ -162,19 +142,6 @@ int main( void )
 		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);
 
-		glBindBuffer(GL_ARRAY_BUFFER, normalDrawBuffer);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(
-			0,
-			3,
-			GL_FLOAT,
-			GL_FALSE,
-			0,
-			(void*)0
-		);
-		glDrawArrays(GL_LINES,0,normalDraw.size());
-		glDisableVertexAttribArray(0);
-
 		// Swap buffers
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -184,7 +151,6 @@ int main( void )
 
 	glDeleteBuffers(1,&vertexBuffer);
 	glDeleteBuffers(1,&normalBuffer);
-	glDeleteBuffers(1,&normalDrawBuffer);
 	glDeleteVertexArrays(1,&vao);
 	glDeleteProgram(programID);
 
