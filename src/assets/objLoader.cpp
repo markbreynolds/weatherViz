@@ -1,13 +1,16 @@
-#include "object.hpp"
+#include "objLoader.hpp"
 
-bool loadOBJ(istream &stream, vector<glm::vec3> &vertices, vector<glm::vec3> &normals) {
+using namespace std;
+
+bool loadOBJ(istream &obj, istream &mtl, vector<glm::vec3> &vertices, vector<glm::vec2> &uvs, vector<glm::vec3> &normals, Material** material) {
   vector <glm::vec3> vertexList;
+  vector <glm::vec2> uvList;
   vector <glm::vec3> normalList;
 
-  while (!stream.eof()) {
+  while (!obj.eof()) {
     string line;
-    getline(stream, line);
-    if (stream.fail()) {
+    getline(obj, line);
+    if (obj.fail()) {
       cout << "Read failed." << endl;
       return false;
     }
@@ -29,7 +32,20 @@ bool loadOBJ(istream &stream, vector<glm::vec3> &vertices, vector<glm::vec3> &no
         glm::vec3 vertex (x,y,z);
         vertexList.push_back(vertex);
       }
-      if (header == "vn"){
+      else if (header == "vt") {
+        float x,y;
+        int tmp = line.find_first_of(" ",headEnd+1);
+        x = stof(line.substr(headEnd+1,tmp));
+        int tmp2 = line.find_first_of(" ",tmp+1);
+        //if (tmp2 == -1) {cout << '.';}
+        y = stof(line.substr(tmp+1,tmp2));
+        if (OBJ_UV_FLIPY) {
+          y = 1-y;
+        }
+        glm::vec2 uv (x,y);
+        uvList.push_back(uv);
+      }
+      else if (header == "vn") {
         float x,y,z;
         int tmp = line.find_first_of(" ",headEnd+1);
         x = stof(line.substr(headEnd+1,tmp));
@@ -64,6 +80,9 @@ bool loadOBJ(istream &stream, vector<glm::vec3> &vertices, vector<glm::vec3> &no
           {
             uv = stoi(sub);
           }
+          else {
+            uv = -1;
+          }
 
           sub = line.substr(tmp2+1,end-tmp2-1);
           if (sub.size()==0)
@@ -81,28 +100,45 @@ bool loadOBJ(istream &stream, vector<glm::vec3> &vertices, vector<glm::vec3> &no
           cin >> input; //*/
 
           vertices.push_back(vertexList[vertex-1]);
+          if (uv!=-1) {
+            uvs.push_back(uvList[uv-1]);
+          }
           normals.push_back(normalList[normal-1]);
           start = end+1;
           end = line.find_first_of(" ",start);
         }
       }
     }
-    stream.peek();
+    obj.peek();
   }
+
+  Material* materialTest = loadMTL(mtl);
+  *material = materialTest;
 
   return true;
 }
 
-bool loadOBJString(string String, vector<glm::vec3> &vertices, vector<glm::vec3> &normals) {
-  istringstream stream (String);
-  return loadOBJ(stream, vertices, normals);
+bool loadOBJString(string objString, string mtlString, vector<glm::vec3> &vertices, vector<glm::vec2> &uvs, vector<glm::vec3> &normals, Material** material) {
+  istringstream objStream (objString);
+  istringstream mtlStream (mtlString);
+  return loadOBJ(objStream, mtlStream, vertices, uvs, normals, material);
 }
 
-bool loadOBJFile(const string path, vector<glm::vec3> &vertices, vector<glm::vec3> &normals) {
-  ifstream file (path.c_str());
-  if (!file.good()){
-    cout << "File not found." << endl;
+bool loadOBJFile(const string path, vector<glm::vec3> &vertices, vector<glm::vec2> &uvs, vector<glm::vec3> &normals, Material** material) {
+  string mtlPath = path.substr(0,path.size()-3)+"mtl";
+  return loadOBJFile(path, mtlPath, vertices, uvs, normals, material);
+}
+
+bool loadOBJFile(string objPath, string mtlPath, vector<glm::vec3> &vertices, vector<glm::vec2> &uvs, vector<glm::vec3> &normals, Material** material) {
+  ifstream objFile (objPath.c_str());
+  ifstream mtlFile (mtlPath.c_str());
+  if (!objFile.good()) {
+    cout << "File not found: " << objPath << endl;
     return false;
   }
-  return loadOBJ(file, vertices, normals);
+  if (!mtlFile.good()) {
+    cout << "File not found: " << mtlPath << endl;
+    return false;
+  }
+  return loadOBJ(objFile, mtlFile, vertices, uvs, normals, material);
 }

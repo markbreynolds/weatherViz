@@ -7,6 +7,7 @@ Hardware:
 +Graphics card with OpenGL 3 support.
 
 Software:  
++cmake  
 +glm  
 +glfw3  
 +glew  
@@ -16,7 +17,7 @@ If any of these are problematic, please let me know. I can look into converting 
 
 # Installation:
 
-Run the following commands:  
+Run the following commands in the top directory:  
 1. `cmake .`  
 2. `make`
 
@@ -38,3 +39,12 @@ D: Move Camera East
 
 E: Move Camera Down  
 Q: Move Camera Up  
+
+# Documentation:
+
+Documentation can be generated if you have Doxygen installed. To generate the documentation run the following commands:
+
+1. `cmake .`  
+2. `make docs`
+
+This will generate the documentation in the "docs/html" directory.
