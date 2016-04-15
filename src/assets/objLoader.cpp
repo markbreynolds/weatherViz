@@ -2,7 +2,7 @@
 
 using namespace std;
 
-bool loadOBJ(istream &obj, istream &mtl, vector<glm::vec3> &vertices, vector<glm::vec2> &uvs, vector<glm::vec3> &normals, Material** material) {
+bool loadOBJ(istream &obj, istream &mtl, vector<glm::vec3> &vertices, vector<glm::vec2> &uvs, vector<glm::vec3> &normals, Material* &material) {
   vector <glm::vec3> vertexList;
   vector <glm::vec2> uvList;
   vector <glm::vec3> normalList;
@@ -112,24 +112,23 @@ bool loadOBJ(istream &obj, istream &mtl, vector<glm::vec3> &vertices, vector<glm
     obj.peek();
   }
 
-  Material* materialTest = loadMTL(mtl);
-  *material = materialTest;
+  material = loadMTL(mtl);
 
   return true;
 }
 
-bool loadOBJString(string objString, string mtlString, vector<glm::vec3> &vertices, vector<glm::vec2> &uvs, vector<glm::vec3> &normals, Material** material) {
+bool loadOBJString(string objString, string mtlString, vector<glm::vec3> &vertices, vector<glm::vec2> &uvs, vector<glm::vec3> &normals, Material* &material) {
   istringstream objStream (objString);
   istringstream mtlStream (mtlString);
   return loadOBJ(objStream, mtlStream, vertices, uvs, normals, material);
 }
 
-bool loadOBJFile(const string path, vector<glm::vec3> &vertices, vector<glm::vec2> &uvs, vector<glm::vec3> &normals, Material** material) {
+bool loadOBJFile(const string path, vector<glm::vec3> &vertices, vector<glm::vec2> &uvs, vector<glm::vec3> &normals, Material* &material) {
   string mtlPath = path.substr(0,path.size()-3)+"mtl";
   return loadOBJFile(path, mtlPath, vertices, uvs, normals, material);
 }
 
-bool loadOBJFile(string objPath, string mtlPath, vector<glm::vec3> &vertices, vector<glm::vec2> &uvs, vector<glm::vec3> &normals, Material** material) {
+bool loadOBJFile(string objPath, string mtlPath, vector<glm::vec3> &vertices, vector<glm::vec2> &uvs, vector<glm::vec3> &normals, Material* &material) {
   ifstream objFile (objPath.c_str());
   ifstream mtlFile (mtlPath.c_str());
   if (!objFile.good()) {

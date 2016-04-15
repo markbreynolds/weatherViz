@@ -11,6 +11,7 @@
 /// Which fragment shader should OpenGL use for this material.
 enum ShaderType { SolidShader, TextureShader, SkyShader};
 
+/// Container holding information about how to color fragments.
 class Material {
 private:
   glm::vec3 diffuseColor;
@@ -21,6 +22,9 @@ public:
 
   /// Default Constructor
   Material() : diffuseColor(glm::vec3(0,0,0)), specColor(glm::vec3(255,255,255)), diffuseTexture(0), shader(SolidShader) {}
+
+  /// Copy Constructor
+  Material(Material* that) : diffuseColor(that->getDiffuseColor()), specColor(that->getSpecularColor()), diffuseTexture(that->getDiffuseTexture()), shader(that->getShaderType()) {}
 
   /// Solid Constructor
   Material(glm::vec3 diffuse, glm::vec3 specular) : diffuseColor(diffuse), specColor(specular), diffuseTexture(0), shader(SolidShader) {}

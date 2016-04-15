@@ -2,11 +2,14 @@ cmake_minimum_required (VERSION 3.1)
 project (test1)
 
 set (CMAKE_BUILD_TYPE debug)
+
+set (EXTRA_SRC ${EXTRA_SRC} ${PROJECT_SOURCE_DIR}/src/vboIndexer.cpp)
+set (EXTRA_SRC ${EXTRA_SRC} ${PROJECT_SOURCE_DIR}/src/object.cpp)
+
 include_directories (${PROJECT_SOURCE_DIR}/src/assets/)
 set (EXTRA_SRC ${EXTRA_SRC} ${PROJECT_SOURCE_DIR}/src/assets/objLoader.cpp)
 set (EXTRA_SRC ${EXTRA_SRC} ${PROJECT_SOURCE_DIR}/src/assets/mtlLoader.cpp)
 set (EXTRA_SRC ${EXTRA_SRC} ${PROJECT_SOURCE_DIR}/src/assets/image.cpp)
-
 
 include_directories (${PROJECT_SOURCE_DIR}/include/)
 

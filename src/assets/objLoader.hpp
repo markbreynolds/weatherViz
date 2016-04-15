@@ -36,7 +36,7 @@
  *
  * @see loadMTL()
  */
-bool loadOBJ(std::istream &obj,  std::istream &mtl, std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals, Material** material);
+bool loadOBJ(std::istream &obj,  std::istream &mtl, std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals, Material* &material);
 
 /**
  * Loads an .obj and .mtl from two strings and places the appropiate data into the appropiate vectors.
@@ -48,7 +48,7 @@ bool loadOBJ(std::istream &obj,  std::istream &mtl, std::vector<glm::vec3> &vert
  *
  * @see loadOBJ().
  */
-bool loadOBJString(std::string objString, std::string mtlString, std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals, Material** material);
+bool loadOBJString(std::string objString, std::string mtlString, std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals, Material* &material);
 
 /**
  * Loads an .obj and .mtl from two files and places the appropiate data into the
@@ -60,7 +60,7 @@ bool loadOBJString(std::string objString, std::string mtlString, std::vector<glm
  * @see loadOBJFile(std::string objPath, std::string mtlPath, std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals)
  * @see loadOBJ().
  */
-bool loadOBJFile(std::string path, std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals, Material** material);
+bool loadOBJFile(std::string path, std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals, Material* &material);
 
 /**
  * Loads an .obj and .mtl from two files and places the appropiate data into the appropiate vectors.
@@ -70,6 +70,6 @@ bool loadOBJFile(std::string path, std::vector<glm::vec3> &vertices, std::vector
  *
  * @see loadOBJ().
  */
-bool loadOBJFile(std::string objPath, std::string mtlPath, std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals, Material** material);
+bool loadOBJFile(std::string objPath, std::string mtlPath, std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals, Material* &material);
 
 /** @} */
