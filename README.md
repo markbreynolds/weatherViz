@@ -45,39 +45,39 @@ You can click and drag with the mouse to look around. This is a WIP at the momen
 
 # Milestones:
 
-~~Milestone 1:~~
-+~~Models (mesh/textures showing properly in OpenGL):~~
-++~~Windmill~~
-++~~Ground~~
-++~~Sky box/sphere~~
-+~~Manual weather control.~~
-+~~Windmill turns faster with wind speed.~~
+~~Milestone 1:~~  
++~~Models (mesh/textures showing properly in OpenGL):~~  
+++~~Windmill~~  
+++~~Ground~~  
+++~~Sky box/sphere~~  
++~~Manual weather control.~~  
++~~Windmill turns faster with wind speed.~~  
 
-Milestone 2:
-+Grass (Either particle system or billboard)
-+Trees
-+Soft body dynamics (Wind) for grass and trees
-+Rain (Probably particle system, if not, fullscreen texture)
+Milestone 2:  
++Grass (Either particle system or billboard)  
++Trees  
++Soft body dynamics (Wind) for grass and trees  
++Rain (Probably particle system, if not, fullscreen texture)  
 
-Milestone 3:
-+Fog (Find some way to make OGL fog look decent)
-+Snow
-+Hail
-+Shadows/Proper Lighting
-+Automatic weather control (online)
+Milestone 3:  
++Fog (Find some way to make OGL fog look decent)  
++Snow  
++Hail  
++Shadows/Proper Lighting  
++Automatic weather control (online)  
 
-Milestone 4 (Extras):
-+360-degree look around
-+Automatic weather control (from Raspberry Pi based weather station)
-+Change lighting for time of day.
-+Clouds/Fog move slowly
-+Special Effects/Compositing
-+Lens Flare
-+Focus
-+New visualization environments
-++Mountain
-++Forest
-++City
+Milestone 4 (Extras):  
++360-degree look around  
++Automatic weather control (from Raspberry Pi based weather station)  
++Change lighting for time of day.  
++Clouds/Fog move slowly  
++Special Effects/Compositing  
++Lens Flare  
++Focus  
++New visualization environments  
+++Mountain  
+++Forest  
+++City  
 
 # Documentation:
 
