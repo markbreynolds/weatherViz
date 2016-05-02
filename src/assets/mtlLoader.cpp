@@ -49,8 +49,7 @@ Material* loadMTL(istream &mtl) {
         }
         else if (header == "map_Kd") {
           int end = line.find_first_of("#",headEnd+1);
-          texture = pngTexture(line.substr(headEnd+1,end));
-          cout << line.substr(headEnd+1,end) << endl;
+          texture = loadPNGAsTexture(line.substr(headEnd+1,end));
           shader = TextureShader;
         }
       }

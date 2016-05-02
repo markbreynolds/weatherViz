@@ -13,11 +13,11 @@ void pngInfo(string imageFile) {
   cout << "Height: " << height << endl;
 }
 
-GLuint pngTexture(string imageFile) {
+GLuint loadPNGAsTexture(string imageFile) {
   vector<unsigned char> image;
   unsigned width, height;
 
-  unsigned error = lodepng::decode(image,width,height, imageFile);
+  unsigned error = lodepng::decode(image,width,height,imageFile);
 
   if (error != 0) {
     cout << "error " << error << ": " << lodepng_error_text(error) << endl;

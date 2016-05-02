@@ -14,7 +14,7 @@
 
 /**
  * Prints to standard out the height and width of a png image.
- * @param imagePath The path to the image.
+ * @param imagePath The path to the images
  */
 void pngInfo(std::string imagePath);
 
@@ -25,6 +25,6 @@ void pngInfo(std::string imagePath);
  *
  * @param imagePath The path to the image.
  */
-GLuint pngTexture(std::string imagePath);
+GLuint loadPNGAsTexture(std::string imagePath);
 
 /** @} */

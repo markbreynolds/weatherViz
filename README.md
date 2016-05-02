@@ -23,22 +23,61 @@ Run the following commands in the top directory:
 
 This should generate an executable for your system. However, assets are not packed into this executable, so it will only run while the "assets" folder is in the same folder as the executable.
 
-Unfortunately, there is no system install procedure.
+There is currently no system install procedure.
 
 # Controls:
-
-The camera currently always looks toward the object at (0,0,0).
 
 Left Arrow: Rotate Mesh Left  
 Right Arrow: Rotate Mesh Right
 
-W: Move Camera North  
-A: Move Camera West  
-S: Move Camera South  
-D: Move Camera East  
+W: Move Camera Forward  
+A: Move Camera Left  
+S: Move Camera Back  
+D: Move Camera Right  
 
 E: Move Camera Down  
-Q: Move Camera Up  
+Q: Move Camera Up
+
+O: Increase Windspeed  
+L: Decrease Windspeed
+
+You can click and drag with the mouse to look around. This is a WIP at the moment and is currently behaving strangely.
+
+# Milestones:
+
+~~Milestone 1:~~
++~~Models (mesh/textures showing properly in OpenGL):~~
+++~~Windmill~~
+++~~Ground~~
+++~~Sky box/sphere~~
++~~Manual weather control.~~
++~~Windmill turns faster with wind speed.~~
+
+Milestone 2:
++Grass (Either particle system or billboard)
++Trees
++Soft body dynamics (Wind) for grass and trees
++Rain (Probably particle system, if not, fullscreen texture)
+
+Milestone 3:
++Fog (Find some way to make OGL fog look decent)
++Snow
++Hail
++Shadows/Proper Lighting
++Automatic weather control (online)
+
+Milestone 4 (Extras):
++360-degree look around
++Automatic weather control (from Raspberry Pi based weather station)
++Change lighting for time of day.
++Clouds/Fog move slowly
++Special Effects/Compositing
++Lens Flare
++Focus
++New visualization environments
+++Mountain
+++Forest
+++City
 
 # Documentation:
 

@@ -4,12 +4,17 @@ project (test1)
 set (CMAKE_BUILD_TYPE debug)
 
 set (EXTRA_SRC ${EXTRA_SRC} ${PROJECT_SOURCE_DIR}/src/vboIndexer.cpp)
-set (EXTRA_SRC ${EXTRA_SRC} ${PROJECT_SOURCE_DIR}/src/object.cpp)
+set (EXTRA_SRC ${EXTRA_SRC} ${PROJECT_SOURCE_DIR}/src/console.cpp)
+
+include_directories (${PROJECT_SOURCE_DIR}/src/objects/)
+set (EXTRA_SRC ${EXTRA_SRC} ${PROJECT_SOURCE_DIR}/src/objects/object.cpp)
+set (EXTRA_SRC ${EXTRA_SRC} ${PROJECT_SOURCE_DIR}/src/objects/windmill.cpp)
 
 include_directories (${PROJECT_SOURCE_DIR}/src/assets/)
 set (EXTRA_SRC ${EXTRA_SRC} ${PROJECT_SOURCE_DIR}/src/assets/objLoader.cpp)
 set (EXTRA_SRC ${EXTRA_SRC} ${PROJECT_SOURCE_DIR}/src/assets/mtlLoader.cpp)
 set (EXTRA_SRC ${EXTRA_SRC} ${PROJECT_SOURCE_DIR}/src/assets/image.cpp)
+#set (EXTRA_SRC ${EXTRA_SRC} ${PROJECT_SOURCE_DIR}/src/assets/font.cpp)
 
 include_directories (${PROJECT_SOURCE_DIR}/include/)
 
@@ -17,6 +22,11 @@ include_directories (${PROJECT_SOURCE_DIR}/include/)
 include_directories ("${PROJECT_SOURCE_DIR}/include/LodePNG")
 add_subdirectory ("include/LodePNG")
 set (EXTRA_LIBS ${EXTRA_LIBS} "LodePNG")
+
+#include FreeType
+#include_directories ("${PROJECT_SOURCE_DIR}/include/FreeType")
+#set (EXTRA_SRC ${EXTRA_SRC} ${PROJECT_SOURCE_DIR}/include/FreeType/libfreetype.a)
+#set (EXTRA_LIBS ${EXTRA_LIBS} ${PROJECT_SOURCE_DIR}/include/FreeType/libfreetype.a)
 
 #Include OpenGL and GLEW:
 find_package (OpenGL REQUIRED)
@@ -27,7 +37,7 @@ include_directories (GLEW_INCLUDE_DIR)
 #Include GLFW:
 find_package (PkgConfig REQUIRED)
 pkg_search_module (GLFW REQUIRED glfw3)
-include_directories ($(GLFW_INCLUDE_DIRS))
+include_directories (${GLFW_INCLUDE_DIRS})
 
 #Documentation:
 find_package (Doxygen)

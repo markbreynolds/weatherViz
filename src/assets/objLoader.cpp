@@ -2,10 +2,12 @@
 
 using namespace std;
 
-bool loadOBJ(istream &obj, istream &mtl, vector<glm::vec3> &vertices, vector<glm::vec2> &uvs, vector<glm::vec3> &normals, Material* &material) {
+bool loadOBJ(istream &obj, vector<glm::vec3> &vertices, vector<glm::vec2> &uvs, vector<glm::vec3> &normals, std::queue<unsigned short> &groupIndex) {
   vector <glm::vec3> vertexList;
   vector <glm::vec2> uvList;
   vector <glm::vec3> normalList;
+
+  bool group = false;
 
   while (!obj.eof()) {
     string line;
@@ -106,29 +108,39 @@ bool loadOBJ(istream &obj, istream &mtl, vector<glm::vec3> &vertices, vector<glm
           normals.push_back(normalList[normal-1]);
           start = end+1;
           end = line.find_first_of(" ",start);
+          if (group) {
+            groupIndex.push(vertices.size()-1);
+          }
+        }
+      }
+      else if (header == "g") {
+        if (line.substr(headEnd+1,-1) == "(null)" || line.substr(headEnd+1,-1).size()==0) {
+          group = false;
+        }
+        else {
+          group = true;
         }
       }
     }
     obj.peek();
   }
 
-  material = loadMTL(mtl);
-
   return true;
 }
 
-bool loadOBJString(string objString, string mtlString, vector<glm::vec3> &vertices, vector<glm::vec2> &uvs, vector<glm::vec3> &normals, Material* &material) {
+bool loadOBJString(string objString, string mtlString, vector<glm::vec3> &vertices, vector<glm::vec2> &uvs, vector<glm::vec3> &normals, Material *&material, std::queue<unsigned short> &groups) {
   istringstream objStream (objString);
   istringstream mtlStream (mtlString);
-  return loadOBJ(objStream, mtlStream, vertices, uvs, normals, material);
+  material = loadMTL(mtlStream);
+  return loadOBJ(objStream, vertices, uvs, normals, groups);
 }
 
-bool loadOBJFile(const string path, vector<glm::vec3> &vertices, vector<glm::vec2> &uvs, vector<glm::vec3> &normals, Material* &material) {
+bool loadOBJFile(const string path, vector<glm::vec3> &vertices, vector<glm::vec2> &uvs, vector<glm::vec3> &normals, Material* &material, std::queue<unsigned short> &groups) {
   string mtlPath = path.substr(0,path.size()-3)+"mtl";
-  return loadOBJFile(path, mtlPath, vertices, uvs, normals, material);
+  return loadOBJFile(path, mtlPath, vertices, uvs, normals, material, groups);
 }
 
-bool loadOBJFile(string objPath, string mtlPath, vector<glm::vec3> &vertices, vector<glm::vec2> &uvs, vector<glm::vec3> &normals, Material* &material) {
+bool loadOBJFile(string objPath, string mtlPath, vector<glm::vec3> &vertices, vector<glm::vec2> &uvs, vector<glm::vec3> &normals, Material* &material, std::queue<unsigned short> &groups) {
   ifstream objFile (objPath.c_str());
   ifstream mtlFile (mtlPath.c_str());
   if (!objFile.good()) {
@@ -139,5 +151,15 @@ bool loadOBJFile(string objPath, string mtlPath, vector<glm::vec3> &vertices, ve
     cout << "File not found: " << mtlPath << endl;
     return false;
   }
-  return loadOBJ(objFile, mtlFile, vertices, uvs, normals, material);
+  material = loadMTL(mtlFile);
+  return loadOBJ(objFile, vertices, uvs, normals, groups);
+}
+
+bool loadOBJFile(std::string path, std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals, std::queue<unsigned short> &groups) {
+  ifstream objFile (path.c_str());
+  if (!objFile.good()) {
+    cout << "File not found: " << path << endl;
+    return false;
+  }
+  return loadOBJ(objFile, vertices, uvs, normals, groups);
 }

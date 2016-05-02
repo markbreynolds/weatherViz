@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <queue>
 
 #include <glm/glm.hpp>
 
@@ -22,6 +23,13 @@
  * @param uvIndex List of indexed UVs.
  * @param normalIndex List of indexed normals.
  */
-void createVBOIndex(std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals, std::vector<unsigned short> &index, std::vector<glm::vec3> &vertexIndex, std::vector<glm::vec2> &uvIndex, std::vector<glm::vec3> &normalIndex);
+void createVBOIndex(std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals, std::vector<unsigned short> &indices, std::vector<glm::vec3> &vertexIndex, std::vector<glm::vec2> &uvIndex, std::vector<glm::vec3> &normalIndex);
 
+/**
+ * @overload
+ *
+ * @param groupIndex Group indices input.
+ * @param indexedGroup Group indices output.
+ */
+void createVBOIndex(std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals, std::queue<unsigned short> &groupIndex, std::vector<unsigned short> &indices, std::vector<unsigned short> &indexedGroup, std::vector<glm::vec3> &vertexIndex, std::vector<glm::vec2> &uvIndex, std::vector<glm::vec3> &normalIndex);
 /** @} */

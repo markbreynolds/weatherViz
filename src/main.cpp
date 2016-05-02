@@ -1,33 +1,45 @@
 #include <iostream>
 #include <vector>
+#include <map>
 #include <climits>
+#include <queue>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/transform.hpp>
 
 #include "main.hpp"
 #include "vboIndexer.hpp"
-#include "object.hpp"
+#include "objects/object.hpp"
+#include "objects/windmill.hpp"
 #include "assets/objLoader.hpp"
 #include "assets/image.hpp"
 #include "assets/material.hpp"
 #include "shader.hpp"
+#include "console.hpp"
 
 GLFWwindow* window;
 
 using namespace std;
 
 glm::vec3 cameraPos = glm::vec3(0,1,5);
-glm::vec3 lightPos = glm::vec3(3,4,3);
+glm::vec3 lookAtDir = glm::vec3(0,0,1);
+glm::vec3 lightPos = glm::vec3(0,10,0);
 glm::vec3 rotation(0,0,0);
+
+glm::vec2* dragLast = nullptr;
 
 //For measuring speed.
 double lastTime = glfwGetTime();
 unsigned short numFrames = 0;
+
+unsigned short wind = 0;		// Windspeed in miles per hour
+
+map<const string, float> displayText;
 
 bool running = true;
 
@@ -59,7 +71,7 @@ int main( void )
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Open a window and create its OpenGL context
-	window = glfwCreateWindow( 640, 480, "Test", NULL, NULL);
+	window = glfwCreateWindow( SCREEN_WIDTH, SCREEN_HEIGHT, "Test", NULL, NULL);
 	if( window == NULL ){
 		cout << "Failed to open GLFW window. If you have an Intel GPU, it is not 3.3 compatible." << endl;
 		glfwTerminate();
@@ -67,6 +79,7 @@ int main( void )
 	}
 	glfwMakeContextCurrent(window);
 	glfwSetKeyCallback(window, key_callback);
+	glfwSetCursorPosCallback(window, cursor_position_callback);
 
 	// Initialize GLEW
 	glewExperimental = true;
@@ -76,35 +89,78 @@ int main( void )
 		return -1;
 	}
 
-	vector<glm::vec3> verticesOrig;
-	vector<glm::vec2> uvsOrig;
-	vector<glm::vec3> normalsOrig;
+	cout << "Loading Sky..." << endl;
+	Object* sky;
+	{
+		vector<glm::vec3> verticesOrig;
+		vector<glm::vec2> uvsOrig;
+		vector<glm::vec3> normalsOrig;
+		queue<unsigned short> groupIndex;
 
-	Material* material;
+		Material* material;
 
-	bool res = loadOBJFile("assets/models/monkey2.obj", verticesOrig, uvsOrig, normalsOrig, material);
-	cout << verticesOrig.size() << " vertices loaded." << endl;
-	cout << uvsOrig.size() << " UVs loaded." << endl;
-	cout << normalsOrig.size()  << " normals loaded." << endl << endl;
+		bool res = loadOBJFile("assets/models/Sky.obj", verticesOrig, uvsOrig, normalsOrig, material, groupIndex);
 
-	vector<unsigned short> indices;
-	vector<glm::vec3> vertices;
-	vector<glm::vec2> uvs;
-	vector<glm::vec3> normals;
-	createVBOIndex(verticesOrig,uvsOrig,normalsOrig,indices,vertices,uvs,normals);
-	cout << "Reduced to: " << vertices.size() << " vertices." << endl;
+		vector<unsigned short> indices;
+		vector<glm::vec3> vertices;
+		vector<glm::vec2> uvs;
+		vector<glm::vec3> normals;
+		createVBOIndex(verticesOrig,uvsOrig,normalsOrig,indices,vertices,uvs,normals);
 
-	vector<Object*> objects;
-	objects.push_back(new Object(vertices,uvs,normals,indices,material));
-	objects[0]->translate(glm::vec3(-3,1,-3));
-	objects[0]->rotate(glm::vec3(0,0,3.14));
-	objects.push_back(new Object(vertices,uvs,normals,indices,material));
-	objects[1]->translate(glm::vec3(3,1,-3));
-	objects[1]->rotate(glm::vec3(0,0,3.14));
-	objects.push_back(new Object(vertices,uvs,normals,indices,material));
+		material->setShaderType(SkyShader);
+		sky = new Object(vertices,uvs,normals,indices,material);
+	}
 
+	cout << "Loading Ground..." << endl;
+	Object* ground;
+	{
+		vector<glm::vec3> verticesOrig;
+		vector<glm::vec2> uvsOrig;
+		vector<glm::vec3> normalsOrig;
+		queue<unsigned short> groupIndex;
+
+		Material* material;
+
+		bool res = loadOBJFile("assets/models/Ground.obj", verticesOrig, uvsOrig, normalsOrig, material, groupIndex);
+
+		vector<unsigned short> indices;
+		vector<glm::vec3> vertices;
+		vector<glm::vec2> uvs;
+		vector<glm::vec3> normals;
+		createVBOIndex(verticesOrig,uvsOrig,normalsOrig,indices,vertices,uvs,normals);
+
+		ground = new Object(vertices,uvs,normals,indices,material);
+	}
+
+	//vector<Object*> objects;
+	Windmill* windmill;
+
+	cout << "Loading Windmill..." << endl;
+	{
+		vector<glm::vec3> verticesOrig;
+		vector<glm::vec2> uvsOrig;
+		vector<glm::vec3> normalsOrig;
+		queue<unsigned short> groupIndex;
+
+		Material* material;
+		bool res = loadOBJFile("assets/models/Windmill.obj", verticesOrig, uvsOrig, normalsOrig, material, groupIndex);
+
+		vector<unsigned short> indices;
+		vector<glm::vec3> vertices;
+		vector<glm::vec2> uvs;
+		vector<glm::vec3> normals;
+		vector<unsigned short> indexedGroup;
+		createVBOIndex(verticesOrig,uvsOrig,normalsOrig,groupIndex,indices,indexedGroup,vertices,uvs,normals);
+
+		windmill = new Windmill(vertices,uvs,normals,indices,material,indexedGroup);
+		windmill->translate(glm::vec3(6,0,6));
+		windmill->rotate(glm::vec3(0,2,0));
+	}
+
+	cout << "Loading Shaders..." << endl;
 	GLuint solidProgramID = LoadShaders("assets/shaders/SolidShader.vert", "assets/shaders/SolidShader.frag");
 	GLuint textureProgramID = LoadShaders("assets/shaders/TextureShader.vert", "assets/shaders/TextureShader.frag");
+	GLuint skyProgramID = LoadShaders("assets/shaders/SkyShader.vert", "assets/shaders/SkyShader.frag");
 
 	// Dark blue background
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
@@ -115,20 +171,50 @@ int main( void )
 	glGenVertexArrays(1,&vao);
 	glBindVertexArray(vao);
 
-	glm::mat4 projection = glm::perspective(glm::radians(45.0f),(float)640/(float)480,0.1f,100.0f);
+	glm::mat4 projection = glm::perspective(glm::radians(FOV),(float)SCREEN_WIDTH/(float)SCREEN_HEIGHT,0.1f,100.0f);
+
+	cout << "Done loading!" << endl << endl << endl;
 
 	do{
+		displayText["Wind Speed (m.p.h.): "] = wind;
+		if (wind < 10) {
+			windmill->setSpinSpeed(0);
+		}
+		else if (wind > 60) {
+			windmill->setSpinSpeed(.16);
+		}
+		else {
+			float speed = (wind-10.0)/50.0 * .16;
+			cout << speed;
+			cout.flush();
+			windmill->setSpinSpeed(speed);
+		}
+
 		showTimePerFrame();
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 		glm::mat4 view = glm::lookAt(
 			cameraPos,	// Camera location.
-			glm::vec3(0,0,0),	// Looking at origin.
+			cameraPos+lookAtDir,	// Looking direction
 			glm::vec3(0,1,0)	// Up vector.
 		);
 
-		for (int i = 0; i < objects.size(); i++) {
-			objects[i]->rotate(rotation);
+		//Sky->setPosition(cameraPos);
+		glUseProgram(skyProgramID);
+		sky->draw(skyProgramID, view, projection);
+
+		glUseProgram(solidProgramID);
+		GLuint lightPosID = glGetUniformLocation(solidProgramID,"lightPos");
+		glUniform3f(lightPosID,lightPos.x,lightPos.y,lightPos.z);
+		ground->draw(solidProgramID, view, projection);
+
+		glUseProgram(textureProgramID);
+		glUniform3f(lightPosID,lightPos.x,lightPos.y,lightPos.z);
+		windmill->update(0.0);
+		windmill->draw(textureProgramID, view, projection);
+
+		/*for (int i = 0; i < objects.size(); i++) {
+			objects[i]->update(0.0);
 			if (objects[i]->getShaderType() == TextureShader) {
 				glUseProgram(textureProgramID);
 				GLuint lightPosID = glGetUniformLocation(textureProgramID,"lightPos");
@@ -141,19 +227,23 @@ int main( void )
 				glUniform3f(lightPosID,lightPos.x,lightPos.y,lightPos.z);
 				objects[i]->draw(solidProgramID, view, projection);
 			}
-		}
-		rotation = glm::vec3(0,0,0);
+		}*/
 
 		// Swap buffers
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
+		printLineVals(displayText);
+
 	} // Check if the ESC key was pressed or the window was closed
 	while( running && !glfwWindowShouldClose(window));
 
-	for (int i = 0; i < objects.size(); i++) {
+	delete sky;
+	delete ground;
+	delete windmill;
+	/*for (int i = 0; i < objects.size(); i++) {
 		delete objects[i];
-	}
+	}*/
 	glDeleteVertexArrays(1,&vao);
 	glDeleteProgram(solidProgramID);
 	glDeleteProgram(textureProgramID);
@@ -171,21 +261,31 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			cameraPos[1] += moveAmt;
 		}
 		else if (key == GLFW_KEY_W) {
-			cameraPos[2] += moveAmt;
+			cameraPos.x += lookAtDir.x;
+			cameraPos.z += lookAtDir.z;
 		}
 		else if (key == GLFW_KEY_A) {
-			cameraPos[0] += moveAmt;
+			cameraPos.x += lookAtDir.z;
+			cameraPos.z -= lookAtDir.x;
 		}
 		else if (key == GLFW_KEY_S) {
-			cameraPos[2] -= moveAmt;
+			cameraPos.x -= lookAtDir.x;
+			cameraPos.z -= lookAtDir.z;
 		}
 		else if (key == GLFW_KEY_E) {
 			cameraPos[1] -= moveAmt;
 		}
 		else if (key == GLFW_KEY_D) {
-			cameraPos[0] -= moveAmt;
+			cameraPos.x -= lookAtDir.z;
+			cameraPos.z += lookAtDir.x;
 		}
-		else if (key == GLFW_KEY_LEFT) {
+		else if (key == GLFW_KEY_O) {
+			wind += 1;
+		}
+		else if (key == GLFW_KEY_L) {
+			wind -= 1;
+		}
+		/*else if (key == GLFW_KEY_LEFT) {
 			rotation += glm::vec3(0,-rotAmt,0);
 		}
 		else if (key == GLFW_KEY_RIGHT) {
@@ -196,9 +296,39 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		}
 		else if (key == GLFW_KEY_DOWN) {
 			rotation += glm::vec3(rotAmt,0,0);
-		}
+		}*/
 		else if (key == GLFW_KEY_ESCAPE) {
 			running = false;
+		}
+	}
+}
+
+static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
+	int state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
+	if (state == GLFW_RELEASE) {
+		delete dragLast;
+		dragLast = nullptr;
+		return;
+	}
+	else {
+		if (dragLast == nullptr){
+			dragLast = new glm::vec2(xpos,ypos);
+		}
+		else {
+			double xdist = xpos - dragLast->x;
+			double ydist = dragLast->y - ypos;
+
+			displayText["xDist: "] = xdist;
+			displayText["yDist: "] = ydist;
+
+			glm::quat rot = glm::quat(glm::vec3(glm::radians(ydist*(FOV/SCREEN_WIDTH))*2,glm::radians(xdist*(FOV/SCREEN_WIDTH))*2,0));
+			lookAtDir = glm::vec3(glm::mat4_cast(rot) * glm::vec4(lookAtDir,1));
+
+			displayText["lookX: "] = lookAtDir.x;
+			displayText["lookY: "] = lookAtDir.y;
+			displayText["lookZ: "] = lookAtDir.z;
+
+			dragLast = new glm::vec2(xpos,ypos);
 		}
 	}
 }
@@ -206,9 +336,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 void showTimePerFrame(){
 	double currTime = glfwGetTime();
 	numFrames++;
-	if (currTime - lastTime >= 5.0) {
-		cout << 5000.0/double(numFrames) << " ms/frame" << endl;
+	if (currTime - lastTime >= 1.0) {
+		displayText["ms/frame = "] = 1000.0/double(numFrames);
 		numFrames = 0;
-		lastTime += 5.0;
+		lastTime += 1.0;
 	}
 }

@@ -52,3 +52,48 @@ void createVBOIndex(std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uv
     }
   }
 }
+
+void createVBOIndex(std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals, std::queue<unsigned short> &groupIndex, std::vector<unsigned short> &indices, std::vector<unsigned short> &indexedGroup, std::vector<glm::vec3> &vertexIndex, std::vector<glm::vec2> &uvIndex, std::vector<glm::vec3> &normalIndex) {
+  bool uvsPresent;
+  if (uvs.size() == 0) { uvsPresent = false; }
+  else { uvsPresent = true; }
+
+  std::map<PackedVertex, unsigned short> indexMap;
+
+  for (unsigned int i=0; i < vertices.size(); i++) {
+    if (groupIndex.front() < i) {
+      std::cout << groupIndex.front() << " < " << i << " ";
+      groupIndex.pop();
+      while (groupIndex.front() < i && groupIndex.size()>0) {
+        std::cout << groupIndex.front() << " < " << i << " ";
+        groupIndex.pop();
+      }
+      std::cout << std::endl;
+    }
+    glm::vec2 uv;
+    if (uvsPresent) { uv = uvs[i]; }
+    else { uv = glm::vec2(0,0); }
+
+    PackedVertex pv = {vertices[i],uv,normals[i]};
+    unsigned short index = pvToIndex(pv,indexMap);
+    //std::cout << index << std::endl;
+    if (index==(unsigned short)-1) {
+      vertexIndex.push_back(vertices[i]);
+      uvIndex.push_back(uv);
+      normalIndex.push_back(normals[i]);
+      unsigned short newIndex = (unsigned short)vertexIndex.size()-1;
+      indices.push_back(newIndex);
+      indexMap[pv] = newIndex;
+      if (i==groupIndex.front()) {
+        indexedGroup.push_back(newIndex);
+        groupIndex.pop();
+      }
+    }
+    else {
+      indices.push_back(index);
+      if (i==groupIndex.front()) {
+        groupIndex.pop();
+      }
+    }
+  }
+}

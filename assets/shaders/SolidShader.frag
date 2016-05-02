@@ -13,7 +13,7 @@ void main(){
   float cosTheta = clamp(dot(n,l), 0,1);
 
   //Ambient Light
-  vec3 ambientColor = vec3(.1,.1,.1);
+  vec3 ambientColor = vec3(.15,.15,.15);
 
   color = ambientColor + (materialColor * cosTheta);
 }

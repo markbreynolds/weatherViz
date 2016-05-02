@@ -4,6 +4,7 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
+#include <queue>
 
 #include <glm/glm.hpp>
 
@@ -26,17 +27,16 @@
  * @post vertices.size()==normals.size()
  *
  * @param obj A stream containing the .obj data.
- * @param mtl A stream containing the .mtl data.
  * @param vertices A vector that loaded vertices will be put into.
  * @param uvs A vector that loaded UVs will be put into.
  * @param normals A vector that loaded normals will be put into.
- * @param material A Material pointer that will point to the Material.
+ * @param groups A map containing a vector of vertices for each group.
  *
  * @return @c true if succeeds, false otherwise.
  *
  * @see loadMTL()
  */
-bool loadOBJ(std::istream &obj,  std::istream &mtl, std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals, Material* &material);
+bool loadOBJ(std::istream &obj, std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals, std::queue<unsigned short> &groups);
 
 /**
  * Loads an .obj and .mtl from two strings and places the appropiate data into the appropiate vectors.
@@ -45,10 +45,11 @@ bool loadOBJ(std::istream &obj,  std::istream &mtl, std::vector<glm::vec3> &vert
  *
  * @param obj A string containing the .obj data.
  * @param mtl A string containing the .mtl data.
+ * @param material A Material pointer that will point to the Material.
  *
  * @see loadOBJ().
  */
-bool loadOBJString(std::string objString, std::string mtlString, std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals, Material* &material);
+bool loadOBJString(std::string objString, std::string mtlString, std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals, Material* &material, std::queue<unsigned short> &groups);
 
 /**
  * Loads an .obj and .mtl from two files and places the appropiate data into the
@@ -56,20 +57,27 @@ bool loadOBJString(std::string objString, std::string mtlString, std::vector<glm
  *  Otherwise, the other loadOBJFile function must be used.
  *
  * @param path The path to the .obj file. @c path must include ".obj".
+ * @param material A Material pointer that will point to the Material.
  *
  * @see loadOBJFile(std::string objPath, std::string mtlPath, std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals)
  * @see loadOBJ().
  */
-bool loadOBJFile(std::string path, std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals, Material* &material);
+bool loadOBJFile(std::string path, std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals, Material* &material, std::queue<unsigned short> &groups);
 
 /**
  * Loads an .obj and .mtl from two files and places the appropiate data into the appropiate vectors.
  *
  * @param objPath The path to the obj file.
  * @param mtlPath The path to the mtl file.
+ * @param material A Material pointer that will point to the Material.
  *
  * @see loadOBJ().
  */
-bool loadOBJFile(std::string objPath, std::string mtlPath, std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals, Material* &material);
+bool loadOBJFile(std::string objPath, std::string mtlPath, std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals, Material* &material, std::queue<unsigned short> &groups);
+
+/**
+ * Only loads the OBJ File and not the MTL File.
+ */
+bool loadOBJFile(std::string path, std::vector<glm::vec3> &vertices, std::vector<glm::vec2> &uvs, std::vector<glm::vec3> &normals, std::queue<unsigned short> &groups);
 
 /** @} */
