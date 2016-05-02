@@ -4,14 +4,14 @@ OpenGL Visualization showing how different elements in an environment are effect
 # System Requirements:
 
 Hardware:  
-+Graphics card with OpenGL 3 support.
++ Graphics card with OpenGL 3 support.
 
 Software:  
-+cmake  
-+glm  
-+glfw3  
-+glew  
-+up-to-date graphics card drivers.
++ cmake  
++ glm  
++ glfw3  
++ glew  
++ up-to-date graphics card drivers.
 
 If any of these are problematic, please let me know. I can look into converting code OGL 2 if needed and I can include dependencies if need be.
 
@@ -46,38 +46,38 @@ You can click and drag with the mouse to look around. This is a WIP at the momen
 # Milestones:
 
 ~~Milestone 1:~~  
-+~~Models (mesh/textures showing properly in OpenGL):~~  
-++~~Windmill~~  
-++~~Ground~~  
-++~~Sky box/sphere~~  
-+~~Manual weather control.~~  
-+~~Windmill turns faster with wind speed.~~  
++ ~~Models (mesh/textures showing properly in OpenGL):~~  
+ + ~~Windmill~~  
+ + ~~Ground~~  
+ + ~~Sky box/sphere~~  
++ ~~Manual weather control.~~  
++ ~~Windmill turns faster with wind speed.~~  
 
 Milestone 2:  
-+Grass (Either particle system or billboard)  
-+Trees  
-+Soft body dynamics (Wind) for grass and trees  
-+Rain (Probably particle system, if not, fullscreen texture)  
++ Grass (Either particle system or billboard)  
++ Trees  
++ Soft body dynamics (Wind) for grass and trees  
++ Rain (Probably particle system, if not, fullscreen texture)  
 
 Milestone 3:  
-+Fog (Find some way to make OGL fog look decent)  
-+Snow  
-+Hail  
-+Shadows/Proper Lighting  
-+Automatic weather control (online)  
++ Fog (Find some way to make OGL fog look decent)  
++ Snow  
++ Hail  
++ Shadows/Proper Lighting  
++ Automatic weather control (online)  
 
 Milestone 4 (Extras):  
-+360-degree look around  
-+Automatic weather control (from Raspberry Pi based weather station)  
-+Change lighting for time of day.  
-+Clouds/Fog move slowly  
-+Special Effects/Compositing  
-+Lens Flare  
-+Focus  
-+New visualization environments  
-++Mountain  
-++Forest  
-++City  
++ 360-degree look around  
++ Automatic weather control (from Raspberry Pi based weather station)  
++ Change lighting for time of day.  
++ Clouds/Fog move slowly  
++ Special Effects/Compositing  
++ Lens Flare  
++ Focus  
++ New visualization environments  
+ + Mountain  
+ + Forest  
+ + City  
 
 # Documentation:
 
