@@ -32,7 +32,13 @@ set (EXTRA_LIBS ${EXTRA_LIBS} "LodePNG")
 find_package (OpenGL REQUIRED)
 include_directories (OPENGL_INCLUDE_DIR)
 find_package (GLEW REQUIRED)
-include_directories (GLEW_INCLUDE_DIR)
+
+if(APPLE)
+	include_directories (${GLEW_INCLUDE_DIR})
+#	LINK_DIRECTORIES(${GLEW_INCLUDE_DIR}) 
+else()
+	include_directories (GLEW_INCLUDE_DIR)
+endif()
 
 #Include GLFW:
 find_package (PkgConfig REQUIRED)
@@ -44,6 +50,11 @@ find_package (Doxygen)
 if (DOXYGEN_FOUND)
   add_custom_target (docs ${DOXYGEN_EXECUTABLE} ${PROJECT_SOURCE_DIR}/docs/Doxyfile WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/docs COMMENT "Generating API documentation with Doxygen" VERBATIM)
 endif (DOXYGEN_FOUND)
+
+#Hack for mac(temp)
+if(APPLE)
+	SET( CMAKE_EXE_LINKER_FLAGS   "-L/usr/local/lib")
+endif()
 
 #Executable info:
 add_executable (weather ${PROJECT_SOURCE_DIR}/src/main.cpp ${EXTRA_SRC})
